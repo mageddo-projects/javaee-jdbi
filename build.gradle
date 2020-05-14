@@ -20,9 +20,13 @@ dependencies {
   testCompileOnly("org.projectlombok:lombok:1.18.12")
   testAnnotationProcessor("org.projectlombok:lombok:1.18.12")
   testImplementation("io.quarkus:quarkus-jdbc-postgresql")
+  implementation("io.quarkus:quarkus-flyway")
   testImplementation("io.quarkus:quarkus-junit5")
   testImplementation("io.rest-assured:rest-assured")
   testImplementation("org.mockito:mockito-junit-jupiter:3.3.3")
+  testImplementation("io.zonky.test:embedded-postgres:1.2.5")
+  testImplementation("io.zonky.test.postgres:embedded-postgres-binaries-bom:11.6.0")
+
 }
 
 group "com.mageddo.javaee-jdbi"
