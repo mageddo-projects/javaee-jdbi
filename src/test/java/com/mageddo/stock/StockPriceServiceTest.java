@@ -22,9 +22,6 @@ import static org.wildfly.common.Assert.assertTrue;
 @QuarkusTest
 class StockPriceServiceTest {
 
-//  @RegisterExtension
-//  public static final SingleInstancePostgresExtension postgres = SingleInstancePostgresExtension.singleton();
-
   @Inject
   StockPriceService stockPriceService;
 
@@ -85,13 +82,34 @@ class StockPriceServiceTest {
     );
 
     // act
-    assertThrows(DuplicatedStockException.class, () -> {
-      this.stockPriceService.createStockNested(stocks);
-    });
+    this.stockPriceService.createStockNested(stocks);
 
     // assert
     assertEquals(1, this.stockPriceService.find()
         .size());
 
+  }
+
+  @Test
+  void cantChangeIsolationLevelInAAlreadyInProgressTransaction() {
+    // arrange
+    final List<Stock> stocks = Arrays.asList(
+        Stock
+            .builder()
+            .price(BigDecimal.TEN)
+            .symbol("PAGS")
+            .build(),
+        Stock
+            .builder()
+            .price(BigDecimal.ONE)
+            .symbol("PAGS")
+            .build()
+    );
+
+    // act
+    this.stockPriceService.createSomethingThenCreateItemsOnNestedTransaction(stocks);
+
+    // assert
+    assertEquals(2, this.stockPriceService.find().size());
   }
 }
