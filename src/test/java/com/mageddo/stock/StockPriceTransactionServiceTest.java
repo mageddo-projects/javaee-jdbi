@@ -20,10 +20,10 @@ import static org.wildfly.common.Assert.assertTrue;
 
 @ExtendWith(SingleInstancePostgresExtension.class)
 @QuarkusTest
-class StockPriceServiceTest {
+class StockPriceTransactionServiceTest {
 
   @Inject
-  StockPriceService stockPriceService;
+  StockPriceTransactionService stockPriceTransactionService;
 
   @Inject
   DatabaseConfigurator databaseConfigurator;
@@ -55,17 +55,17 @@ class StockPriceServiceTest {
 
     // act
     assertThrows(DuplicatedStockException.class, () -> {
-      this.stockPriceService.createStock(stocks);
+      this.stockPriceTransactionService.createStock(stocks);
     });
 
     // assert
-    assertTrue(this.stockPriceService.find()
+    assertTrue(this.stockPriceTransactionService.find()
         .isEmpty());
 
   }
 
   @Test
-  void mustGetErrorOnInsertAndRollbackJustTheSecondWhenUsingNestedPropagation() {
+  void mustSaveAllRecords() {
 
     // arrange
     final List<Stock> stocks = Arrays.asList(
@@ -77,39 +77,16 @@ class StockPriceServiceTest {
         Stock
             .builder()
             .price(BigDecimal.ONE)
-            .symbol("PAGS")
+            .symbol("GOOGL")
             .build()
     );
 
     // act
-    this.stockPriceService.createStockNested(stocks);
+    this.stockPriceTransactionService.createStock(stocks);
 
     // assert
-    assertEquals(1, this.stockPriceService.find()
-        .size());
+    assertEquals(2, this.stockPriceTransactionService.find().size());
 
   }
 
-  @Test
-  void cantChangeIsolationLevelInAAlreadyInProgressTransaction() {
-    // arrange
-    final List<Stock> stocks = Arrays.asList(
-        Stock
-            .builder()
-            .price(BigDecimal.TEN)
-            .symbol("PAGS")
-            .build(),
-        Stock
-            .builder()
-            .price(BigDecimal.ONE)
-            .symbol("PAGS")
-            .build()
-    );
-
-    // act
-    this.stockPriceService.createSomethingThenCreateItemsOnNestedTransaction(stocks);
-
-    // assert
-    assertEquals(2, this.stockPriceService.find().size());
-  }
 }

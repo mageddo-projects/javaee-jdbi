@@ -1,27 +1,52 @@
 package javax.transactionv2;
 
+import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.spi.CDI;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
+import javax.sql.DataSource;
 
 import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.transaction.UnableToManipulateTransactionIsolationLevelException;
 
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Interceptor
-@javax.transactionv2.Transactional
-@RequiredArgsConstructor
+@Transactional
 public class TransactionalInterceptor {
 
   private final Jdbi jdbi;
 
+  public TransactionalInterceptor() {
+    final Instance<Jdbi> jdbi = CDI
+        .current()
+        .select(Jdbi.class);
+    final Instance<DataSource> datasource = CDI
+        .current()
+        .select(DataSource.class);
+
+    if(jdbi.isResolvable()){
+      this.jdbi = jdbi.get();
+    } else if(datasource.isResolvable()){
+      this.jdbi = Jdbi.create(datasource.get());
+    } else {
+      this.jdbi = null;
+    }
+  }
+
   @AroundInvoke
   public Object intercept(InvocationContext ctx) throws Exception {
-    final javax.transactionv2.Transactional transactionDef = ctx
+    if(this.jdbi == null){
+      if(log.isDebugEnabled()){
+        log.debug("status=no-jdbi-instance");
+      }
+    }
+    final Transactional transactionDef = ctx
         .getMethod()
-        .getAnnotation(javax.transactionv2.Transactional.class);
+        .getAnnotation(Transactional.class);
     if (transactionDef.propagation() == Propagation.NESTED) {
       return jdbi.inTransaction(handle -> {
         final String savePoint = String.format("savepoint-%d", System.nanoTime());

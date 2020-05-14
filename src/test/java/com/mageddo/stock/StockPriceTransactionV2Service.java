@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Singleton
 @RequiredArgsConstructor
-public class StockPriceService {
+public class StockPriceTransactionV2Service {
 
   private final StockPriceDao stockPriceDao;
 
@@ -50,9 +50,9 @@ public class StockPriceService {
     this.stockPriceDao.createStock(stock);
   }
 
-  StockPriceService self() {
+  StockPriceTransactionV2Service self() {
     return CDI.current()
-        .select(StockPriceService.class)
+        .select(StockPriceTransactionV2Service.class)
         .get();
   }
 

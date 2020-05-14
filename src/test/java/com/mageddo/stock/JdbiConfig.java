@@ -1,4 +1,4 @@
-package javax.transactionv2;
+package com.mageddo.stock;
 
 import javax.enterprise.inject.Produces;
 import javax.inject.Singleton;
