@@ -1,4 +1,4 @@
-package com.mageddo.transaction;
+package javax.transactionv2;
 /*
  * Copyright 2002-2019 the original author or authors.
  *

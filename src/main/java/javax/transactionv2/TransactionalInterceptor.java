@@ -1,4 +1,4 @@
-package com.mageddo.transaction;
+package javax.transactionv2;
 
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
@@ -11,7 +11,7 @@ import org.jdbi.v3.core.transaction.UnableToManipulateTransactionIsolationLevelE
 import lombok.RequiredArgsConstructor;
 
 @Interceptor
-@Transactional
+@javax.transactionv2.Transactional
 @RequiredArgsConstructor
 public class TransactionalInterceptor {
 
@@ -19,9 +19,9 @@ public class TransactionalInterceptor {
 
   @AroundInvoke
   public Object intercept(InvocationContext ctx) throws Exception {
-    final Transactional transactionDef = ctx
+    final javax.transactionv2.Transactional transactionDef = ctx
         .getMethod()
-        .getAnnotation(Transactional.class);
+        .getAnnotation(javax.transactionv2.Transactional.class);
     if (transactionDef.propagation() == Propagation.NESTED) {
       return jdbi.inTransaction(handle -> {
         final String savePoint = String.format("savepoint-%d", System.nanoTime());

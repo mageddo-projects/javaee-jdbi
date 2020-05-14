@@ -6,9 +6,9 @@ import java.util.List;
 import javax.enterprise.inject.spi.CDI;
 import javax.inject.Singleton;
 
-import com.mageddo.transaction.Isolation;
-import com.mageddo.transaction.Propagation;
-import com.mageddo.transaction.Transactional;
+import javax.transactionv2.Isolation;
+import javax.transactionv2.Propagation;
+import javax.transactionv2.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
