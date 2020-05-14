@@ -19,59 +19,50 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 import org.junit.jupiter.api.extension.AfterAllCallback;
-import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
-import org.junit.jupiter.api.extension.BeforeTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ExtensionContext.Store;
 
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 import lombok.SneakyThrows;
 
-public class SingleInstancePostgresExtension implements AfterTestExecutionCallback, BeforeTestExecutionCallback,
-    BeforeAllCallback, AfterAllCallback {
+public class SingleInstancePostgresExtension implements BeforeAllCallback, AfterAllCallback {
 
-  private final EmbeddedPostgres epg;
   private final List<Consumer<EmbeddedPostgres.Builder>> builderCustomizers = new CopyOnWriteArrayList<>();
 
-  @SneakyThrows
   public SingleInstancePostgresExtension() {
-    this.customize(customizer -> {
-      customizer.setPort(5531);
-    });
-    this.epg = this.pg();
-    Runtime.getRuntime().addShutdownHook(new Thread(){
-      @SneakyThrows
-      public void run() {
-        epg.close();
-      }
-    });
-  }
-
-  public static SingleInstancePostgresExtension singleton(){
-    if(System.getProperty("postgres") == null){
-      final SingleInstancePostgresExtension instance = new SingleInstancePostgresExtension();
-      System.getProperties().put("postgres", instance);
-    }
-    return (SingleInstancePostgresExtension) System.getProperties().get("postgres");
-  }
-
-  @Override
-  public void beforeTestExecution(ExtensionContext extensionContext) throws Exception {
-
-  }
-
-  @Override
-  public void afterTestExecution(ExtensionContext extensionContext) {
-
   }
 
   @Override
   public void beforeAll(ExtensionContext context) throws Exception {
+    final Store store = context
+        .getRoot()
+        .getStore(ExtensionContext.Namespace.GLOBAL);
+
+    if (store.get(EmbeddedPostgres.class.getName(), EmbeddedPostgres.class) == null) {
+      setNewInstanceOnContext(store);
+    }
+
   }
 
   @Override
   public void afterAll(ExtensionContext context) throws Exception {
 
+  }
+
+  private void setNewInstanceOnContext(Store store) throws IOException {
+    this.customize(customizer -> {
+      customizer.setPort(5531);
+    });
+    final EmbeddedPostgres instance = this.pg();
+    store.put(EmbeddedPostgres.class.getName(), instance);
+    Runtime.getRuntime()
+        .addShutdownHook(new Thread() {
+          @SneakyThrows
+          public void run() {
+            instance.close();
+          }
+        });
   }
 
   private EmbeddedPostgres pg() throws IOException {
@@ -81,18 +72,8 @@ public class SingleInstancePostgresExtension implements AfterTestExecutionCallba
   }
 
   public SingleInstancePostgresExtension customize(Consumer<EmbeddedPostgres.Builder> customizer) {
-    if (this.epg != null) {
-      throw new AssertionError("already started");
-    }
     this.builderCustomizers.add(customizer);
     return this;
   }
 
-  public EmbeddedPostgres getEmbeddedPostgres() {
-    EmbeddedPostgres epg = this.epg;
-    if (epg == null) {
-      throw new AssertionError("JUnit test not started yet!");
-    }
-    return epg;
-  }
 }
