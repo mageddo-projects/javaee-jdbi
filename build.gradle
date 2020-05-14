@@ -1,7 +1,10 @@
 plugins {
   id "java"
   id "io.quarkus"
+  id "maven"
 }
+
+apply from: "nexus.gradle"
 
 repositories {
   jcenter()
@@ -17,6 +20,11 @@ dependencies {
   implementation platform("org.jdbi:jdbi3-bom:3.13.0")
   implementation("org.jdbi:jdbi3-core")
 
+  implementation "io.quarkus:quarkus-core-deployment:${quarkusPlatformVersion}"
+  implementation "io.quarkus:quarkus-arc-deployment:${quarkusPlatformVersion}"
+  annotationProcessor "io.quarkus:quarkus-arc-deployment:${quarkusPlatformVersion}"
+  compileOnly "io.quarkus:quarkus-extension-processor:${quarkusPlatformVersion}"
+
   testCompileOnly("org.projectlombok:lombok:1.18.12")
   testAnnotationProcessor("org.projectlombok:lombok:1.18.12")
   testImplementation("io.quarkus:quarkus-jdbc-postgresql")
@@ -30,7 +38,7 @@ dependencies {
 }
 
 group "com.mageddo.javaee-jdbi"
-version "1.0.0-SNAPSHOT"
+version "0.1.0"
 
 compileJava {
   options.encoding = "UTF-8"

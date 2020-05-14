@@ -1,5 +1,8 @@
 package javax.transactionv2;
 
+import java.io.Serializable;
+
+import javax.annotation.Priority;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.CDI;
 import javax.interceptor.AroundInvoke;
@@ -16,7 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Interceptor
 @Transactional
-public class TransactionalInterceptor {
+@Priority(Interceptor.Priority.PLATFORM_BEFORE + 200)
+public class TransactionalInterceptor implements Serializable {
 
   private final Jdbi jdbi;
 
@@ -47,6 +51,14 @@ public class TransactionalInterceptor {
     final Transactional transactionDef = ctx
         .getMethod()
         .getAnnotation(Transactional.class);
+
+    if(transactionDef == null){
+      if(log.isDebugEnabled()){
+        log.debug("status=transaction-annotation-is-null");
+      }
+      return ctx.proceed();
+    }
+
     if (transactionDef.propagation() == Propagation.NESTED) {
       return jdbi.inTransaction(handle -> {
         final String savePoint = String.format("savepoint-%d", System.nanoTime());

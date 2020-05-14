@@ -84,5 +84,8 @@
   },
   {
     "name": "org.jdbi.v3.core.qualifier.NVarchar"
+  },
+  {
+    "name": "javax.transactionv2.Transactional"
   }
 ]
