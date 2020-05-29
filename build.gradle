@@ -32,7 +32,7 @@ dependencies {
   testImplementation("io.rest-assured:rest-assured")
   testImplementation("org.mockito:mockito-junit-jupiter:3.3.3")
   testImplementation("io.zonky.test:embedded-postgres:1.2.5")
-  testImplementation("io.zonky.test.postgres:embedded-postgres-binaries-bom:11.6.0")
+  testRuntimeOnly enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:12.2.0")
 
 }
 
