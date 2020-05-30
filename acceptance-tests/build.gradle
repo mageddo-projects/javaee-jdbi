@@ -15,7 +15,6 @@ dependencies {
   implementation("io.quarkus:quarkus-junit5")
   implementation("io.rest-assured:rest-assured")
   implementation(project(":"))
-  implementation("com.mageddo.javaee-jdbi:javaee-jdbi:0.1.0")
   implementation platform("org.jdbi:jdbi3-bom:3.13.0")
   implementation("org.jdbi:jdbi3-core")
 
