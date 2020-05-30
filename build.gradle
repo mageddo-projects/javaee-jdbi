@@ -1,13 +1,26 @@
 plugins {
   id "java"
-  id "io.quarkus"
   id "maven"
 }
 
 apply from: "nexus.gradle"
 
-repositories {
-  jcenter()
+allprojects {
+  repositories {
+    jcenter()
+  }
+  compileJava {
+    options.encoding = "UTF-8"
+    options.compilerArgs << "-parameters"
+  }
+
+  compileTestJava {
+    options.encoding = "UTF-8"
+  }
+
+  java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+  }
 }
 
 dependencies {
@@ -20,34 +33,7 @@ dependencies {
   implementation("javax.enterprise:cdi-api:2.0")
   implementation("javax.annotation:javax.annotation-api:1.3.2")
 
-  testCompileOnly("org.projectlombok:lombok:1.18.12")
-  testAnnotationProcessor("org.projectlombok:lombok:1.18.12")
-  testImplementation enforcedPlatform(
-      "${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"
-  )
-  testImplementation("io.quarkus:quarkus-resteasy")
-  testImplementation("io.quarkus:quarkus-jdbc-postgresql")
-  testImplementation("io.quarkus:quarkus-flyway")
-  testImplementation("io.quarkus:quarkus-junit5")
-  testImplementation("io.rest-assured:rest-assured")
-  testImplementation("org.mockito:mockito-junit-jupiter:3.3.3")
-  testImplementation("io.zonky.test:embedded-postgres:1.2.5")
-  testRuntimeOnly enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:12.2.0")
-
 }
 
 group "com.mageddo.javaee-jdbi"
 version "0.1.0"
-
-compileJava {
-  options.encoding = "UTF-8"
-  options.compilerArgs << "-parameters"
-}
-
-compileTestJava {
-  options.encoding = "UTF-8"
-}
-
-java {
-  sourceCompatibility = JavaVersion.VERSION_1_8
-}

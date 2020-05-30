@@ -1,0 +1,26 @@
+plugins {
+  id "java"
+  id "io.quarkus"
+}
+dependencies {
+
+  compileOnly("org.projectlombok:lombok:1.18.12")
+  annotationProcessor("org.projectlombok:lombok:1.18.12")
+  implementation enforcedPlatform(
+      "${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}"
+  )
+  implementation("io.quarkus:quarkus-resteasy")
+  implementation("io.quarkus:quarkus-jdbc-postgresql")
+  implementation("io.quarkus:quarkus-flyway")
+  implementation("io.quarkus:quarkus-junit5")
+  implementation("io.rest-assured:rest-assured")
+  implementation(project(":"))
+  implementation platform("org.jdbi:jdbi3-bom:3.13.0")
+  implementation("org.jdbi:jdbi3-core")
+
+  testCompileOnly("org.projectlombok:lombok:1.18.12")
+  testAnnotationProcessor("org.projectlombok:lombok:1.18.12")
+  testImplementation("org.mockito:mockito-junit-jupiter:3.3.3")
+  testImplementation("io.zonky.test:embedded-postgres:1.2.5")
+  testRuntimeOnly enforcedPlatform("io.zonky.test.postgres:embedded-postgres-binaries-bom:12.2.0")
+}

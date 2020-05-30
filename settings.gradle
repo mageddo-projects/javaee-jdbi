@@ -10,3 +10,5 @@ pluginManagement {
 }
 
 rootProject.name = "javaee-jdbi"
+
+include ":acceptance-tests"
